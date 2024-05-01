@@ -22,11 +22,19 @@ bot.on("messageCreate", async (msg) => {
       // Send a message indicating the picture to guess
       await msg.channel.createMessage(`Guess the name of the picture: ${pictureName}`);
 
-      // Wait for 10 seconds for the user's guess
+      // Set up a timer for 10 seconds
+      const timer = setTimeout(async () => {
+        await msg.channel.createMessage(`Time's up, ${msg.author.username}.`);
+      }, 10000);
+
+      // Wait for the user's guess
       const filter = (m) => m.author.id === msg.author.id;
       try {
         const collected = await msg.channel.awaitMessages(filter, { max: 1, time: 10000, errors: ['time'] });
         const guess = collected.first().content.toLowerCase();
+
+        // Clear the timer since the user responded in time
+        clearTimeout(timer);
 
         // Check if the user's guess is correct
         if (guess === pictureName.toLowerCase()) {
@@ -37,6 +45,8 @@ bot.on("messageCreate", async (msg) => {
           await msg.channel.createMessage(`Sorry, ${msg.author.username}. Your guess was incorrect.`);
         }
       } catch (err) {
+        // Clear the timer since the time ran out
+        clearTimeout(timer);
         await msg.channel.createMessage(`Time's up, ${msg.author.username}.`);
       }
     } else if (msg.content.startsWith("!points")) {
