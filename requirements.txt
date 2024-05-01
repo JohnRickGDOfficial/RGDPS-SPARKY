@@ -1,7 +1,0 @@
-discord.py
-flask
-
-
-dotenv
-asyncio
-sqlite3
